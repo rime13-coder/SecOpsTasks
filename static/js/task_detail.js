@@ -1,4 +1,5 @@
 const taskId = new URLSearchParams(location.search).get("id");
+let currentTask = null;
 
 function escapeHtml(str) {
     const div = document.createElement("div");
@@ -9,8 +10,9 @@ function escapeHtml(str) {
 async function loadTask() {
     if (!taskId) { location.href = "/"; return; }
     const task = await API.getTask(taskId);
-    document.title = `#${task.id} ${task.title} — SecOps Tasks`;
+    currentTask = task;
 
+    document.title = `#${task.id} ${task.title} — SecOps Tasks`;
     document.getElementById("task-title").textContent = `#${task.id} ${task.title}`;
     document.getElementById("task-status").textContent = task.status.replace("_", " ");
     document.getElementById("task-status").className = `badge badge-${task.status}`;
@@ -51,11 +53,7 @@ async function loadTask() {
         planSection.style.display = "block";
         document.getElementById("plan-content").textContent = task.plan;
         const planActions = document.getElementById("plan-actions");
-        if (task.status === "in_progress" && task.approval_mode === "ask") {
-            planActions.style.display = "flex";
-        } else {
-            planActions.style.display = "none";
-        }
+        planActions.style.display = (task.status === "in_progress" && task.approval_mode === "ask") ? "flex" : "none";
     } else {
         planSection.style.display = "none";
     }
@@ -78,13 +76,12 @@ async function loadTask() {
         logSection.style.display = "none";
     }
 
-    // Cancel button
-    const cancelBtn = document.getElementById("btn-cancel");
-    if (["pending", "in_progress"].includes(task.status)) {
-        cancelBtn.style.display = "inline-block";
-    } else {
-        cancelBtn.style.display = "none";
-    }
+    // Action buttons
+    const isDone = ["completed", "failed", "cancelled"].includes(task.status);
+    const isActive = ["pending", "in_progress"].includes(task.status);
+    document.getElementById("btn-cancel").style.display = isActive ? "inline-block" : "none";
+    document.getElementById("btn-edit").style.display = isDone ? "inline-block" : "none";
+    document.getElementById("btn-requeue").style.display = isDone ? "inline-block" : "none";
 }
 
 async function approveTask() {
@@ -101,6 +98,60 @@ async function cancelTask() {
     if (!confirm("Cancel this task?")) return;
     await API.deleteTask(taskId);
     loadTask();
+}
+
+function toggleEditForm() {
+    const form = document.getElementById("edit-form");
+    if (form.style.display === "none") {
+        document.getElementById("edit-description").value = currentTask.description || "";
+        document.getElementById("edit-actions").value = currentTask.required_actions || "";
+        document.getElementById("edit-notes").value = "";
+        form.style.display = "block";
+    } else {
+        form.style.display = "none";
+    }
+}
+
+async function saveEdit() {
+    const updates = {};
+    const desc = document.getElementById("edit-description").value.trim();
+    const actions = document.getElementById("edit-actions").value.trim();
+    const notes = document.getElementById("edit-notes").value.trim();
+
+    if (desc !== (currentTask.description || "")) updates.description = desc;
+    if (actions !== (currentTask.required_actions || "")) updates.required_actions = actions;
+    if (notes) {
+        const existing = currentTask.summary || "";
+        updates.summary = existing ? existing + "\n\n--- Notes ---\n" + notes : notes;
+    }
+
+    if (Object.keys(updates).length === 0) {
+        document.getElementById("edit-form").style.display = "none";
+        return;
+    }
+
+    try {
+        await API.updateTask(taskId, updates);
+        document.getElementById("edit-form").style.display = "none";
+        await loadTask();
+    } catch (err) {
+        alert("Error saving: " + err.message);
+    }
+}
+
+async function requeueTask() {
+    if (!confirm("Requeue this task for execution? Status will be set back to pending.")) return;
+    try {
+        await API.updateTask(taskId, {
+            status: "pending",
+            plan: "",
+            execution_log: "",
+            claimed_at: null
+        });
+        await loadTask();
+    } catch (err) {
+        alert("Error requeuing: " + err.message);
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {

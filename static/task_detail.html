@@ -24,8 +24,32 @@
             <span id="task-status" class="badge"></span>
             <span id="task-priority" class="badge" style="margin-left:0.25rem"></span>
         </div>
-        <button id="btn-cancel" class="secondary outline" style="display:none" onclick="cancelTask()">Cancel Task</button>
+        <div id="header-actions" style="display:flex; gap:0.5rem;">
+            <button id="btn-edit" class="outline" style="display:none" onclick="toggleEditForm()">Edit</button>
+            <button id="btn-requeue" style="display:none" onclick="requeueTask()">Requeue</button>
+            <button id="btn-cancel" class="secondary outline" style="display:none" onclick="cancelTask()">Cancel Task</button>
+        </div>
     </header>
+
+    <div id="edit-form" class="manage-form" style="display:none">
+        <h3>Edit Task</h3>
+        <label>
+            Description
+            <textarea id="edit-description" rows="4"></textarea>
+        </label>
+        <label>
+            Required Actions
+            <textarea id="edit-actions" rows="4"></textarea>
+        </label>
+        <label>
+            Notes (appended to summary)
+            <textarea id="edit-notes" rows="3" placeholder="Add notes..."></textarea>
+        </label>
+        <div class="form-actions">
+            <button onclick="saveEdit()">Save</button>
+            <button class="secondary outline" onclick="toggleEditForm()">Cancel</button>
+        </div>
+    </div>
 
     <div class="detail-grid">
         <div><strong>Client</strong><br><span id="detail-client">—</span></div>

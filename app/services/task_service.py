@@ -103,11 +103,16 @@ async def update_task(task_id: int, data: dict) -> dict | None:
         "approval_mode", "priority", "category", "status", "plan", "summary",
         "execution_log", "output_folder", "claimed_at",
     }
+    # Nullable columns that can be explicitly set to NULL
+    nullable = {"claimed_at"}
     fields, params = [], []
     for key, val in data.items():
-        if key in allowed and val is not None:
-            fields.append(f"{key} = ?")
-            params.append(val)
+        if key not in allowed:
+            continue
+        if val is None and key not in nullable:
+            continue
+        fields.append(f"{key} = ?")
+        params.append(val)
     if not fields:
         return task
     fields.append("updated_at = ?")
