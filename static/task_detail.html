@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Detail — SecOps Task Manager</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="/" class="brand">SecOps Tasks</a>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="clients.html">Clients</a>
+            <a href="projects.html">Projects</a>
+            <a href="task_new.html">+ New Task</a>
+        </div>
+    </nav>
+
+    <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <div>
+            <h2 id="task-title" style="margin-bottom:0.25rem">Loading...</h2>
+            <span id="task-status" class="badge"></span>
+            <span id="task-priority" class="badge" style="margin-left:0.25rem"></span>
+        </div>
+        <button id="btn-cancel" class="secondary outline" style="display:none" onclick="cancelTask()">Cancel Task</button>
+    </header>
+
+    <div class="detail-grid">
+        <div><strong>Client</strong><br><span id="detail-client">—</span></div>
+        <div><strong>Project</strong><br><span id="detail-project">—</span></div>
+        <div class="detail-full" id="client-desc-row" style="display:none"><strong>Client Description</strong><br><span id="detail-client-desc" style="white-space:pre-wrap">—</span></div>
+        <div class="detail-full" id="project-desc-row" style="display:none"><strong>Project Description</strong><br><span id="detail-project-desc" style="white-space:pre-wrap">—</span></div>
+        <div><strong>Category</strong><br><span id="detail-category">—</span></div>
+        <div><strong>Approval Mode</strong><br><span id="detail-mode">—</span></div>
+        <div><strong>Created</strong><br><span id="detail-created">—</span></div>
+        <div><strong>Updated</strong><br><span id="detail-updated">—</span></div>
+        <div><strong>Claimed</strong><br><span id="detail-claimed">—</span></div>
+        <div><strong>Output Folder</strong><br><span id="detail-folder" style="word-break:break-all">—</span></div>
+    </div>
+
+    <hr>
+
+    <h4>Description</h4>
+    <p id="detail-description" style="white-space:pre-wrap">—</p>
+
+    <h4>Required Actions</h4>
+    <p id="detail-actions" style="white-space:pre-wrap">—</p>
+
+    <div id="plan-section" style="display:none">
+        <hr>
+        <h4>Execution Plan</h4>
+        <div id="plan-content" class="plan-box"></div>
+        <div id="plan-actions" class="plan-actions" style="display:none">
+            <button onclick="approveTask()" style="--pico-background-color: var(--completed)">Approve Plan</button>
+            <button class="secondary" onclick="rejectTask()">Reject Plan</button>
+        </div>
+    </div>
+
+    <div id="summary-section" style="display:none">
+        <hr>
+        <h4>Summary</h4>
+        <p id="summary-content" style="white-space:pre-wrap"></p>
+    </div>
+
+    <div id="log-section" style="display:none">
+        <hr>
+        <h4>Execution Log</h4>
+        <div id="log-content" class="log-box"></div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/task_detail.js"></script>
+</body>
+</html>

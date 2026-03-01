@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects — SecOps Task Manager</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="/" class="brand">SecOps Tasks</a>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="clients.html">Clients</a>
+            <a href="task_new.html" role="button">+ New Task</a>
+        </div>
+    </nav>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h2 style="margin:0">Projects</h2>
+        <button id="btn-add" onclick="showAddForm()">+ Add Project</button>
+    </div>
+
+    <div class="filter-bar">
+        <select id="filter-client">
+            <option value="">All Clients</option>
+        </select>
+    </div>
+
+    <div id="project-form-area"></div>
+    <div id="project-list" class="manage-grid">
+        <div class="empty-state"><p>Loading...</p></div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/projects.js"></script>
+</body>
+</html>

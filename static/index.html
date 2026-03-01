@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecOps Task Manager</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="/" class="brand">SecOps Tasks</a>
+        <div class="nav-links">
+            <a href="clients.html">Clients</a>
+            <a href="projects.html">Projects</a>
+            <a href="task_new.html" role="button">+ New Task</a>
+        </div>
+    </nav>
+
+    <div id="stats-row" class="stats-row"></div>
+
+    <div class="filter-bar">
+        <select id="filter-status">
+            <option value="">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="in_progress">In Progress</option>
+            <option value="approved">Approved</option>
+            <option value="completed">Completed</option>
+            <option value="failed">Failed</option>
+            <option value="cancelled">Cancelled</option>
+        </select>
+        <select id="filter-client"></select>
+        <select id="filter-category">
+            <option value="">All Categories</option>
+            <option value="documentation">Documentation</option>
+            <option value="template">Template</option>
+            <option value="report">Report</option>
+            <option value="log_analysis">Log Analysis</option>
+            <option value="script">Script</option>
+            <option value="presentation">Presentation</option>
+            <option value="remediation">Remediation</option>
+            <option value="compliance">Compliance</option>
+            <option value="recon">Recon</option>
+            <option value="general">General</option>
+        </select>
+    </div>
+
+    <div id="task-list" class="task-list">
+        <div class="empty-state"><p>Loading...</p></div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

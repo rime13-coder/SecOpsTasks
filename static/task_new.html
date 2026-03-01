@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Task — SecOps Task Manager</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="/" class="brand">SecOps Tasks</a>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="clients.html">Clients</a>
+            <a href="projects.html">Projects</a>
+        </div>
+    </nav>
+
+    <h2>Create New Task</h2>
+
+    <form id="task-form">
+        <div class="form-row">
+            <label>
+                Client
+                <select name="client_id" id="client_id" required>
+                    <option value="">Select a client...</option>
+                </select>
+            </label>
+            <label>
+                Project
+                <select name="project_id" id="project_id" required>
+                    <option value="">Select a project...</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="form-row">
+            <div>
+                <div class="context-box-label">Client Description</div>
+                <div class="context-box" id="client-desc-box"></div>
+            </div>
+            <div>
+                <div class="context-box-label">Project Description</div>
+                <div class="context-box" id="project-desc-box"></div>
+            </div>
+        </div>
+
+        <label>
+            Title
+            <input type="text" name="title" required placeholder="Brief task title">
+        </label>
+
+        <div class="form-row">
+            <label>
+                Category
+                <select name="category" id="category"></select>
+            </label>
+            <label>
+                Priority
+                <select name="priority">
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                </select>
+            </label>
+        </div>
+
+        <fieldset>
+            <legend>Approval Mode</legend>
+            <label><input type="radio" name="approval_mode" value="auto"> Auto — execute immediately</label>
+            <label><input type="radio" name="approval_mode" value="ask" checked> Ask — show plan, wait for approval</label>
+        </fieldset>
+
+        <label>
+            Description
+            <textarea name="description" rows="4" placeholder="Detailed task description..."></textarea>
+        </label>
+
+        <label>
+            Required Actions
+            <textarea name="required_actions" rows="4" placeholder="Step-by-step actions for Claude to perform..."></textarea>
+        </label>
+
+        <button type="submit">Create Task</button>
+    </form>
+
+    <script src="js/api.js"></script>
+    <script src="js/task_form.js"></script>
+</body>
+</html>
