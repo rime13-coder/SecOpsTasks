@@ -45,4 +45,19 @@ const API = {
     manageCreateProject(data) { return this.request("POST", "/api/manage/projects", data); },
     manageUpdateProject(id, data) { return this.request("PUT", `/api/manage/projects/${id}`, data); },
     manageDeleteProject(id) { return this.request("DELETE", `/api/manage/projects/${id}`); },
+
+    // Templates API
+    getTemplates() { return this.request("GET", "/api/templates"); },
+    getTemplate(id) { return this.request("GET", `/api/templates/${id}`); },
+    createTemplate(data) { return this.request("POST", "/api/templates", data); },
+    updateTemplate(id, data) { return this.request("PUT", `/api/templates/${id}`, data); },
+    deleteTemplate(id) { return this.request("DELETE", `/api/templates/${id}`); },
+    createTaskFromTemplate(id) { return this.request("POST", `/api/templates/${id}/create-task`); },
+
+    // Webhooks API
+    getWebhooks() { return this.request("GET", "/api/webhooks"); },
+    getWebhook(id) { return this.request("GET", `/api/webhooks/${id}`); },
+    createWebhook(data) { return this.request("POST", "/api/webhooks", data); },
+    updateWebhook(id, data) { return this.request("PUT", `/api/webhooks/${id}`, data); },
+    deleteWebhook(id) { return this.request("DELETE", `/api/webhooks/${id}`); },
 };

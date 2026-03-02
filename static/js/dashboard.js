@@ -59,6 +59,28 @@ function renderTaskCard(task) {
         ? `<div class="kanban-card-due${isOverdue(task) ? " overdue" : ""}">${formatDueDate(task.due_date)}</div>`
         : "";
 
+    // Progress bar
+    let progressHtml = "";
+    if (task.progress_total > 0) {
+        const pct = Math.round((task.progress / task.progress_total) * 100);
+        const label = task.progress_label || `${task.progress}/${task.progress_total}`;
+        progressHtml = `
+            <div class="kanban-card-progress">
+                <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+                <span class="progress-text">${escapeHtml(label)}</span>
+            </div>`;
+    }
+
+    // Indicators: deps, retries, recurrence
+    const indicators = [];
+    if (task.depends_on && task.depends_on.length > 0)
+        indicators.push(`<span class="card-indicator" title="Depends on ${task.depends_on.length} task(s)">&#x1f517;${task.depends_on.length}</span>`);
+    if (task.max_retries > 0)
+        indicators.push(`<span class="card-indicator" title="Retries: ${task.retry_count}/${task.max_retries}">&#x21bb;${task.retry_count}/${task.max_retries}</span>`);
+    if (task.recurrence)
+        indicators.push(`<span class="card-indicator" title="Recurring: ${task.recurrence}">&#x1f501;${task.recurrence}</span>`);
+    const indicatorHtml = indicators.length ? `<div class="kanban-card-indicators">${indicators.join(" ")}</div>` : "";
+
     return `
         <div class="kanban-card" onclick="location.href='task_detail.html?id=${task.id}'">
             <div class="kanban-card-header">
@@ -70,6 +92,8 @@ function renderTaskCard(task) {
                 &middot; ${task.category}
             </div>
             ${dueDateHtml}
+            ${indicatorHtml}
+            ${progressHtml}
             ${closedBadge ? `<div class="kanban-card-closed">${closedBadge}</div>` : ""}
             ${needsApproval ? `<div class="kanban-card-approval">Plan submitted — awaiting approval</div>` : ""}
             ${actions}

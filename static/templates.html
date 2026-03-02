@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Templates — SecOps Task Manager</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="/" class="brand">SecOps Tasks</a>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="clients.html">Clients</a>
+            <a href="projects.html">Projects</a>
+            <a href="templates.html">Templates</a>
+            <a href="webhooks.html">Webhooks</a>
+        </div>
+    </nav>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+        <h2 style="margin:0">Task Templates</h2>
+        <button onclick="showAddForm()">+ New Template</button>
+    </div>
+
+    <div id="template-form" class="manage-form" style="display:none">
+        <h3 id="form-title">New Template</h3>
+        <input type="hidden" id="form-id">
+        <label>Template Name <input type="text" id="form-name" required></label>
+        <div class="form-row">
+            <label>Client <select id="form-client"><option value="">Select...</option></select></label>
+            <label>Project <select id="form-project"><option value="">Select...</option></select></label>
+        </div>
+        <label>Task Title <input type="text" id="form-title-field" placeholder="Title for created tasks"></label>
+        <div class="form-row">
+            <label>Category
+                <select id="form-category">
+                    <option value="general">General</option>
+                    <option value="documentation">Documentation</option>
+                    <option value="template">Template</option>
+                    <option value="report">Report</option>
+                    <option value="log_analysis">Log Analysis</option>
+                    <option value="script">Script</option>
+                    <option value="presentation">Presentation</option>
+                    <option value="remediation">Remediation</option>
+                    <option value="compliance">Compliance</option>
+                    <option value="recon">Recon</option>
+                </select>
+            </label>
+            <label>Priority
+                <select id="form-priority">
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                </select>
+            </label>
+        </div>
+        <div class="form-row">
+            <label>Approval Mode
+                <select id="form-approval">
+                    <option value="ask">Ask</option>
+                    <option value="auto">Auto</option>
+                </select>
+            </label>
+            <label>Due Date Offset (days) <input type="number" id="form-offset" placeholder="e.g. 7"></label>
+        </div>
+        <div class="form-row">
+            <label>Max Retries <input type="number" id="form-retries" min="0" value="0"></label>
+            <label>Recurrence
+                <select id="form-recurrence">
+                    <option value="">None</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="biweekly">Biweekly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+            </label>
+        </div>
+        <label>Description <textarea id="form-description" rows="3"></textarea></label>
+        <label>Required Actions <textarea id="form-actions" rows="3"></textarea></label>
+        <div class="form-actions">
+            <button onclick="saveTemplate()">Save</button>
+            <button class="secondary outline" onclick="hideForm()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="templates-grid" class="manage-grid">
+        <div class="empty-state"><p>Loading...</p></div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/templates.js"></script>
+</body>
+</html>

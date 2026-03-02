@@ -39,11 +39,43 @@ async function loadTask() {
     document.getElementById("detail-category").textContent = task.category;
     document.getElementById("detail-mode").textContent = task.approval_mode;
     document.getElementById("detail-due-date").textContent = task.due_date || "—";
+
+    // New fields
+    const deps = task.depends_on || [];
+    document.getElementById("detail-depends-on").innerHTML = deps.length
+        ? deps.map(id => `<a href="task_detail.html?id=${id}">#${id}</a>`).join(", ")
+        : "—";
+    document.getElementById("detail-retries").textContent =
+        task.max_retries > 0 ? `${task.retry_count} / ${task.max_retries}` : "—";
+    document.getElementById("detail-recurrence").textContent = task.recurrence || "—";
+
     document.getElementById("detail-created").textContent = new Date(task.created_at + "Z").toLocaleString();
     document.getElementById("detail-updated").textContent = new Date(task.updated_at + "Z").toLocaleString();
     document.getElementById("detail-claimed").textContent = task.claimed_at
         ? new Date(task.claimed_at + "Z").toLocaleString() : "—";
     document.getElementById("detail-folder").textContent = task.output_folder || "—";
+
+    // Progress section
+    const progressSection = document.getElementById("progress-section");
+    if (task.progress_total > 0) {
+        progressSection.style.display = "block";
+        const pct = Math.round((task.progress / task.progress_total) * 100);
+        document.getElementById("progress-fill").style.width = pct + "%";
+        const label = task.progress_label || `${task.progress}/${task.progress_total}`;
+        document.getElementById("progress-text").textContent = `${label} (${pct}%)`;
+    } else {
+        progressSection.style.display = "none";
+    }
+
+    // Context section
+    const contextSection = document.getElementById("context-section");
+    const ctx = task.context || {};
+    if (Object.keys(ctx).length > 0) {
+        contextSection.style.display = "block";
+        document.getElementById("context-content").textContent = JSON.stringify(ctx, null, 2);
+    } else {
+        contextSection.style.display = "none";
+    }
 
     document.getElementById("detail-description").textContent = task.description || "—";
     document.getElementById("detail-actions").textContent = task.required_actions || "—";
@@ -114,6 +146,9 @@ function toggleEditForm() {
         document.getElementById("edit-description").value = currentTask.description || "";
         document.getElementById("edit-actions").value = currentTask.required_actions || "";
         document.getElementById("edit-due-date").value = currentTask.due_date || "";
+        document.getElementById("edit-max-retries").value = currentTask.max_retries || 0;
+        document.getElementById("edit-recurrence").value = currentTask.recurrence || "";
+        document.getElementById("edit-depends-on").value = (currentTask.depends_on || []).join(", ");
         document.getElementById("edit-notes").value = "";
         form.style.display = "block";
     } else {
@@ -131,6 +166,18 @@ async function saveEdit() {
     if (desc !== (currentTask.description || "")) updates.description = desc;
     if (actions !== (currentTask.required_actions || "")) updates.required_actions = actions;
     if (dueDate !== (currentTask.due_date || null)) updates.due_date = dueDate;
+
+    const maxRetries = parseInt(document.getElementById("edit-max-retries").value) || 0;
+    if (maxRetries !== (currentTask.max_retries || 0)) updates.max_retries = maxRetries;
+
+    const recurrence = document.getElementById("edit-recurrence").value;
+    if (recurrence !== (currentTask.recurrence || "")) updates.recurrence = recurrence;
+
+    const depsStr = document.getElementById("edit-depends-on").value.trim();
+    const newDeps = depsStr ? depsStr.split(",").map(s => parseInt(s.trim())).filter(n => !isNaN(n)) : [];
+    const oldDeps = currentTask.depends_on || [];
+    if (JSON.stringify(newDeps) !== JSON.stringify(oldDeps)) updates.depends_on = newDeps;
+
     if (notes) {
         const existing = currentTask.summary || "";
         updates.summary = existing ? existing + "\n\n--- Notes ---\n" + notes : notes;

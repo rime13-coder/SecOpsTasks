@@ -14,6 +14,8 @@
             <a href="/">Dashboard</a>
             <a href="clients.html">Clients</a>
             <a href="projects.html">Projects</a>
+            <a href="templates.html">Templates</a>
+            <a href="webhooks.html">Webhooks</a>
             <a href="task_new.html">+ New Task</a>
         </div>
     </nav>
@@ -42,10 +44,32 @@
             Required Actions
             <textarea id="edit-actions" rows="4"></textarea>
         </label>
-        <label>
-            Due Date
-            <input type="date" id="edit-due-date">
-        </label>
+        <div class="form-row">
+            <label>
+                Due Date
+                <input type="date" id="edit-due-date">
+            </label>
+            <label>
+                Max Retries
+                <input type="number" id="edit-max-retries" min="0">
+            </label>
+        </div>
+        <div class="form-row">
+            <label>
+                Recurrence
+                <select id="edit-recurrence">
+                    <option value="">None</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="biweekly">Biweekly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+            </label>
+            <label>
+                Depends On (task IDs, comma-separated)
+                <input type="text" id="edit-depends-on" placeholder="e.g. 1, 5, 12">
+            </label>
+        </div>
         <label>
             Notes (appended to summary)
             <textarea id="edit-notes" rows="3" placeholder="Add notes..."></textarea>
@@ -64,10 +88,27 @@
         <div><strong>Category</strong><br><span id="detail-category">—</span></div>
         <div><strong>Approval Mode</strong><br><span id="detail-mode">—</span></div>
         <div><strong>Due Date</strong><br><span id="detail-due-date">—</span></div>
+        <div><strong>Depends On</strong><br><span id="detail-depends-on">—</span></div>
+        <div><strong>Retries</strong><br><span id="detail-retries">—</span></div>
+        <div><strong>Recurrence</strong><br><span id="detail-recurrence">—</span></div>
         <div><strong>Created</strong><br><span id="detail-created">—</span></div>
         <div><strong>Updated</strong><br><span id="detail-updated">—</span></div>
         <div><strong>Claimed</strong><br><span id="detail-claimed">—</span></div>
         <div><strong>Output Folder</strong><br><span id="detail-folder" style="word-break:break-all">—</span></div>
+    </div>
+
+    <div id="progress-section" style="display:none">
+        <div style="display:flex; align-items:center; gap:0.5rem; margin:0.5rem 0;">
+            <div class="progress-bar" style="flex:1; height:6px;">
+                <div id="progress-fill" class="progress-fill" style="width:0%"></div>
+            </div>
+            <span id="progress-text" class="progress-text" style="font-size:0.8rem"></span>
+        </div>
+    </div>
+
+    <div id="context-section" style="display:none">
+        <h4>Execution Context</h4>
+        <div id="context-content" class="log-box" style="max-height:200px"></div>
     </div>
 
     <hr>

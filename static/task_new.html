@@ -14,6 +14,8 @@
             <a href="/">Dashboard</a>
             <a href="clients.html">Clients</a>
             <a href="projects.html">Projects</a>
+            <a href="templates.html">Templates</a>
+            <a href="webhooks.html">Webhooks</a>
         </div>
     </nav>
 
@@ -67,10 +69,33 @@
             </label>
         </div>
 
-        <label>
-            Due Date
-            <input type="date" name="due_date" id="task-due-date">
-        </label>
+        <div class="form-row">
+            <label>
+                Due Date
+                <input type="date" name="due_date" id="task-due-date">
+            </label>
+            <label>
+                Max Retries
+                <input type="number" name="max_retries" id="task-max-retries" min="0" value="0" placeholder="0">
+            </label>
+        </div>
+
+        <div class="form-row">
+            <label>
+                Recurrence
+                <select name="recurrence" id="task-recurrence">
+                    <option value="">None</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="biweekly">Biweekly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+            </label>
+            <label>
+                Depends On (task IDs, comma-separated)
+                <input type="text" name="depends_on" id="task-depends-on" placeholder="e.g. 1, 5, 12">
+            </label>
+        </div>
 
         <fieldset>
             <legend>Approval Mode</legend>

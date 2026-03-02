@@ -289,6 +289,50 @@ nav .nav-links a[role="button"] {
     font-size: 0.72rem !important;
 }
 
+.kanban-card-indicators {
+    display: flex;
+    gap: 0.35rem;
+    margin-top: 0.15rem;
+    flex-wrap: wrap;
+}
+
+.card-indicator {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    background: var(--surface-3);
+    padding: 0.05rem 0.35rem;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.kanban-card-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.2rem;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--surface-3);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.3s;
+}
+
+.progress-text {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
 .kanban-empty {
     text-align: center;
     padding: 1.5rem 0.5rem;

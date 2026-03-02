@@ -37,7 +37,7 @@ async def create_task(data: TaskCreate):
 
 @router.put("/{task_id}", response_model=TaskOut)
 async def update_task(task_id: int, data: TaskUpdate):
-    nullable_fields = {"claimed_at", "due_date"}
+    nullable_fields = {"claimed_at", "due_date", "depends_on", "context"}
     raw = data.model_dump()
     updates = {k: v for k, v in raw.items() if v is not None or k in nullable_fields}
     # Remove fields that weren't explicitly set (still None and not in the request body)

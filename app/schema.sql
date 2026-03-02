@@ -30,6 +30,15 @@ CREATE TABLE IF NOT EXISTS tasks (
     priority        TEXT    NOT NULL DEFAULT 'medium' CHECK(priority IN ('low','medium','high','urgent')),
     category        TEXT    NOT NULL DEFAULT 'general',
     due_date        TEXT,
+    depends_on      TEXT    NOT NULL DEFAULT '[]',
+    max_retries     INTEGER NOT NULL DEFAULT 0,
+    retry_count     INTEGER NOT NULL DEFAULT 0,
+    context         TEXT    NOT NULL DEFAULT '{}',
+    recurrence      TEXT    NOT NULL DEFAULT '',
+    source_template_id INTEGER,
+    progress        INTEGER NOT NULL DEFAULT 0,
+    progress_total  INTEGER NOT NULL DEFAULT 0,
+    progress_label  TEXT    NOT NULL DEFAULT '',
     plan            TEXT    NOT NULL DEFAULT '',
     summary         TEXT    NOT NULL DEFAULT '',
     execution_log   TEXT    NOT NULL DEFAULT '',
@@ -57,6 +66,37 @@ INSERT OR IGNORE INTO category_defaults (category, approval_mode, description) V
     ('compliance',    'ask',  'Compliance checks and audit preparation'),
     ('recon',         'ask',  'Reconnaissance and OSINT gathering'),
     ('general',       'ask',  'General tasks');
+
+CREATE TABLE IF NOT EXISTS task_templates (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    name            TEXT    NOT NULL UNIQUE,
+    client_id       INTEGER REFERENCES clients(id),
+    project_id      INTEGER REFERENCES projects(id),
+    title           TEXT    NOT NULL DEFAULT '',
+    description     TEXT    NOT NULL DEFAULT '',
+    required_actions TEXT   NOT NULL DEFAULT '',
+    approval_mode   TEXT    NOT NULL DEFAULT 'ask' CHECK(approval_mode IN ('auto','ask')),
+    priority        TEXT    NOT NULL DEFAULT 'medium' CHECK(priority IN ('low','medium','high','urgent')),
+    category        TEXT    NOT NULL DEFAULT 'general',
+    due_date_offset INTEGER,
+    max_retries     INTEGER NOT NULL DEFAULT 0,
+    context         TEXT    NOT NULL DEFAULT '{}',
+    recurrence      TEXT    NOT NULL DEFAULT '',
+    active          INTEGER NOT NULL DEFAULT 1,
+    last_scheduled_at TEXT,
+    created_at      TEXT    NOT NULL DEFAULT (datetime('now')),
+    updated_at      TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS webhooks (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    url         TEXT    NOT NULL,
+    events      TEXT    NOT NULL DEFAULT '[]',
+    secret      TEXT    NOT NULL DEFAULT '',
+    active      INTEGER NOT NULL DEFAULT 1,
+    created_at  TEXT    NOT NULL DEFAULT (datetime('now')),
+    updated_at  TEXT    NOT NULL DEFAULT (datetime('now'))
+);
 
 -- Migrations: add columns if they don't exist (ALTER TABLE is idempotent via INSERT OR IGNORE pattern)
 -- SQLite doesn't support IF NOT EXISTS on ALTER TABLE, so we catch errors in code.

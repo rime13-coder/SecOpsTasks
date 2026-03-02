@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from app.models import PlanSubmit, CompleteSubmit, FailSubmit, TaskOut
+from app.models import PlanSubmit, CompleteSubmit, FailSubmit, ProgressUpdate, TaskOut
 from app.services import task_service
 
 router = APIRouter(prefix="/api/execution", tags=["execution"])
@@ -48,6 +48,14 @@ async def complete_task(task_id: int, data: CompleteSubmit):
 @router.post("/{task_id}/fail", response_model=TaskOut)
 async def fail_task(task_id: int, data: FailSubmit):
     task = await task_service.fail_task(task_id, data.error, data.execution_log)
+    if not task:
+        raise HTTPException(404, "Task not found or not actionable")
+    return task
+
+
+@router.post("/{task_id}/progress", response_model=TaskOut)
+async def update_progress(task_id: int, data: ProgressUpdate):
+    task = await task_service.update_progress(task_id, data.progress, data.progress_total, data.progress_label)
     if not task:
         raise HTTPException(404, "Task not found or not actionable")
     return task

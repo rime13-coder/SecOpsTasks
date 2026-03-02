@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhooks — SecOps Task Manager</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="/" class="brand">SecOps Tasks</a>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="clients.html">Clients</a>
+            <a href="projects.html">Projects</a>
+            <a href="templates.html">Templates</a>
+            <a href="webhooks.html">Webhooks</a>
+        </div>
+    </nav>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+        <h2 style="margin:0">Webhooks</h2>
+        <button onclick="showAddForm()">+ New Webhook</button>
+    </div>
+
+    <div id="webhook-form" class="manage-form" style="display:none">
+        <h3 id="wh-form-title">New Webhook</h3>
+        <input type="hidden" id="wh-form-id">
+        <label>URL <input type="url" id="wh-url" required placeholder="https://example.com/webhook"></label>
+        <label>Secret (optional) <input type="text" id="wh-secret" placeholder="HMAC signing secret"></label>
+        <label>Events (comma-separated, leave empty for all)
+            <input type="text" id="wh-events" placeholder="task.created, task.completed, task.failed, task.status_changed, task.needs_approval">
+        </label>
+        <div class="form-actions">
+            <button onclick="saveWebhook()">Save</button>
+            <button class="secondary outline" onclick="hideForm()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="webhooks-grid" class="manage-grid">
+        <div class="empty-state"><p>Loading...</p></div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/webhooks.js"></script>
+</body>
+</html>

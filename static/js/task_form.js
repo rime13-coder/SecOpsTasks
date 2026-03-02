@@ -82,6 +82,12 @@ async function handleSubmit(e) {
     };
     const dueDate = form.due_date?.value;
     if (dueDate) data.due_date = dueDate;
+    const maxRetries = parseInt(form.max_retries?.value) || 0;
+    if (maxRetries > 0) data.max_retries = maxRetries;
+    const recurrence = form.recurrence?.value;
+    if (recurrence) data.recurrence = recurrence;
+    const depsStr = form.depends_on?.value?.trim();
+    if (depsStr) data.depends_on = depsStr.split(",").map(s => parseInt(s.trim())).filter(n => !isNaN(n));
 
     try {
         const task = await API.createTask(data);
