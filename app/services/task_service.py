@@ -128,6 +128,17 @@ async def cancel_task(task_id: int) -> dict | None:
     return await update_task(task_id, {"status": "cancelled"})
 
 
+async def destroy_task(task_id: int) -> bool:
+    """Permanently delete a task from the database."""
+    db = await get_db()
+    task = await get_task(task_id)
+    if not task:
+        return False
+    await db.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+    await db.commit()
+    return True
+
+
 async def claim_next_task() -> dict | None:
     db = await get_db()
     priority_order = "CASE t.priority WHEN 'urgent' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'low' THEN 3 END"

@@ -82,6 +82,7 @@ async function loadTask() {
     document.getElementById("btn-cancel").style.display = isActive ? "inline-block" : "none";
     document.getElementById("btn-edit").style.display = isDone ? "inline-block" : "none";
     document.getElementById("btn-requeue").style.display = isDone ? "inline-block" : "none";
+    document.getElementById("btn-delete").style.display = "inline-block";
 }
 
 async function approveTask() {
@@ -98,6 +99,12 @@ async function cancelTask() {
     if (!confirm("Cancel this task?")) return;
     await API.deleteTask(taskId);
     loadTask();
+}
+
+async function destroyTask() {
+    if (!confirm("Permanently delete this task? This cannot be undone.")) return;
+    await API.destroyTask(taskId);
+    location.href = "/";
 }
 
 function toggleEditForm() {

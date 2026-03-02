@@ -49,3 +49,10 @@ async def delete_task(task_id: int):
     if not task:
         raise HTTPException(404, "Task not found")
     return task
+
+
+@router.post("/{task_id}/destroy", status_code=204)
+async def destroy_task(task_id: int):
+    ok = await task_service.destroy_task(task_id)
+    if not ok:
+        raise HTTPException(404, "Task not found")

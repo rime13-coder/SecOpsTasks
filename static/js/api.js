@@ -27,6 +27,7 @@ const API = {
 
     approveTask(id) { return this.request("POST", `/api/execution/${id}/approve`); },
     rejectTask(id) { return this.request("POST", `/api/execution/${id}/reject`); },
+    destroyTask(id) { return this.request("POST", `/api/tasks/${id}/destroy`); },
 
     // Management API
     manageListClients() { return this.request("GET", "/api/manage/clients"); },
