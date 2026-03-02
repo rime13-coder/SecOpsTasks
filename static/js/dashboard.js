@@ -9,7 +9,7 @@ async function loadStats() {
         { label: "Completed", value: stats.completed, cls: "completed" },
         { label: "Failed", value: stats.failed, cls: "failed" },
     ].map(s => `
-        <div class="stat-card">
+        <div class="stat-card" data-status="${s.cls}">
             <div class="stat-value" style="color: var(--${s.cls})">${s.value}</div>
             <div class="stat-label">${s.label}</div>
         </div>

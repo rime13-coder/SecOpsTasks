@@ -1,102 +1,179 @@
+/* ── Modern Dark Theme: Color Palette ─────────────────────────── */
 :root {
-    --pending: #f0ad4e;
-    --in-progress: #5bc0de;
-    --approved: #0275d8;
-    --completed: #5cb85c;
-    --failed: #d9534f;
-    --cancelled: #868e96;
-    --urgent: #d9534f;
-    --high: #f0ad4e;
-    --medium: #5bc0de;
-    --low: #868e96;
+    /* Desaturated, luminance-balanced status colors */
+    --pending:     #d4a054;
+    --in-progress: #5a9fbf;
+    --approved:    #4a8ed4;
+    --completed:   #4caf6a;
+    --failed:      #cf6560;
+    --cancelled:   #7c8490;
+
+    /* Priority colors */
+    --urgent: #cf6560;
+    --high:   #d4a054;
+    --medium: #5a9fbf;
+    --low:    #7c8490;
+
+    /* Layered surfaces */
+    --surface-0: #111118;
+    --surface-1: #18181f;
+    --surface-2: #1f1f28;
+    --surface-3: #262630;
+
+    /* Accent */
+    --accent: #6c8aef;
+    --accent-dim: rgba(108, 138, 239, 0.12);
+
+    /* Borders */
+    --border: rgba(255, 255, 255, 0.07);
+    --border-hover: rgba(255, 255, 255, 0.14);
 }
 
+/* ── Pico Dark Overrides ──────────────────────────────────────── */
+[data-theme="dark"] {
+    --pico-background-color: var(--surface-0);
+    --pico-card-background-color: var(--surface-1);
+    --pico-muted-border-color: var(--border);
+    --pico-primary: var(--accent);
+    --pico-primary-hover: #8aa2f7;
+    --pico-form-element-background-color: var(--surface-3);
+    --pico-form-element-border-color: var(--border);
+    --pico-form-element-focus-color: var(--accent);
+    --pico-color: #c8c8d0;
+    --pico-h1-color: #e4e4ec;
+    --pico-h2-color: #e4e4ec;
+    --pico-h3-color: #dddde4;
+    --pico-h4-color: #dddde4;
+}
+
+/* ── Global Base ──────────────────────────────────────────────── */
 body {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 1rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    background: var(--surface-0);
 }
 
+*, *::before, *::after {
+    transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s, opacity 0.15s, color 0.15s;
+}
+
+/* ── Nav Bar ──────────────────────────────────────────────────── */
 nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--pico-muted-border-color);
+    margin-bottom: 1rem;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
 }
 
 nav .brand {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: 700;
     text-decoration: none;
-    color: var(--pico-primary);
+    color: var(--accent);
+    letter-spacing: -0.01em;
 }
 
 nav .nav-links a {
-    margin-left: 1.5rem;
+    margin-left: 1.25rem;
     text-decoration: none;
+    font-size: 0.85rem;
+    color: #9898a8;
 }
 
-/* Stats row */
+nav .nav-links a:hover {
+    color: #e4e4ec;
+}
+
+nav .nav-links a[role="button"] {
+    padding: 0.35rem 0.85rem;
+    font-size: 0.8rem;
+}
+
+/* ── Stats Row ────────────────────────────────────────────────── */
 .stats-row {
     display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
     flex-wrap: wrap;
 }
 
 .stat-card {
     flex: 1;
-    min-width: 120px;
+    min-width: 100px;
     text-align: center;
-    padding: 0.75rem;
-    border-radius: 8px;
-    background: var(--pico-card-background-color);
-    border: 1px solid var(--pico-muted-border-color);
+    padding: 0.6rem 0.5rem;
+    border-radius: 10px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
 }
 
+.stat-card::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--border);
+    border-radius: 0 0 10px 10px;
+}
+
+.stat-card[data-status="pending"]::after     { background: var(--pending); }
+.stat-card[data-status="in_progress"]::after  { background: var(--in-progress); }
+.stat-card[data-status="approved"]::after     { background: var(--approved); }
+.stat-card[data-status="completed"]::after    { background: var(--completed); }
+.stat-card[data-status="failed"]::after       { background: var(--failed); }
+
 .stat-card .stat-value {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
     line-height: 1;
 }
 
 .stat-card .stat-label {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
-    opacity: 0.7;
-    margin-top: 0.25rem;
+    letter-spacing: 0.04em;
+    opacity: 0.55;
+    margin-top: 0.2rem;
 }
 
-/* Badges */
+/* ── Badges: Translucent Pills ────────────────────────────────── */
 .badge {
     display: inline-block;
-    padding: 0.15rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 10px;
+    font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
-    color: #fff;
+    letter-spacing: 0.03em;
 }
 
-.badge-pending     { background: var(--pending); }
-.badge-in_progress { background: var(--in-progress); }
-.badge-approved    { background: var(--approved); }
-.badge-completed   { background: var(--completed); }
-.badge-failed      { background: var(--failed); }
-.badge-cancelled   { background: var(--cancelled); }
+.badge-pending     { background: rgba(212, 160, 84, 0.15);  color: var(--pending); }
+.badge-in_progress { background: rgba(90, 159, 191, 0.15);  color: var(--in-progress); }
+.badge-approved    { background: rgba(74, 142, 212, 0.15);  color: var(--approved); }
+.badge-completed   { background: rgba(76, 175, 106, 0.15);  color: var(--completed); }
+.badge-failed      { background: rgba(207, 101, 96, 0.15);  color: var(--failed); }
+.badge-cancelled   { background: rgba(124, 132, 144, 0.15); color: var(--cancelled); }
 
-.badge-urgent { background: var(--urgent); }
-.badge-high   { background: var(--high); color: #333; }
-.badge-medium { background: var(--medium); }
-.badge-low    { background: var(--low); }
+.badge-urgent { background: rgba(207, 101, 96, 0.15); color: var(--urgent); }
+.badge-high   { background: rgba(212, 160, 84, 0.15); color: var(--high); }
+.badge-medium { background: rgba(90, 159, 191, 0.15); color: var(--medium); }
+.badge-low    { background: rgba(124, 132, 144, 0.15); color: var(--low); }
 
-/* Filter bar */
+/* ── Filter Bar ───────────────────────────────────────────────── */
 .filter-bar {
     display: flex;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
     flex-wrap: wrap;
     align-items: end;
 }
@@ -104,67 +181,87 @@ nav .nav-links a {
 .filter-bar select,
 .filter-bar input {
     margin-bottom: 0;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 8px;
 }
 
-/* Task cards */
+/* ── Task Cards ───────────────────────────────────────────────── */
 .task-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.4rem;
 }
 
 .task-card {
-    padding: 1rem 1.25rem;
-    border-radius: 8px;
-    background: var(--pico-card-background-color);
-    border: 1px solid var(--pico-muted-border-color);
+    padding: 0.65rem 1rem;
+    border-radius: 10px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-left: 3px solid transparent;
     cursor: pointer;
-    transition: border-color 0.15s;
 }
 
 .task-card:hover {
-    border-color: var(--pico-primary);
+    border-left-color: var(--accent);
+    border-color: var(--border-hover);
+    box-shadow: 0 0 12px rgba(108, 138, 239, 0.06);
 }
 
 .task-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem;
 }
 
 .task-card-header h4 {
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.92rem;
+    font-weight: 600;
 }
 
 .task-card-meta {
-    font-size: 0.85rem;
-    opacity: 0.7;
+    font-size: 0.78rem;
+    opacity: 0.5;
 }
 
 .task-card-badges {
     display: flex;
-    gap: 0.4rem;
+    gap: 0.35rem;
 }
 
 .task-card-actions {
     display: flex;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
 }
 
 .task-card-actions button {
-    padding: 0.3rem 0.75rem;
-    font-size: 0.8rem;
+    padding: 0.25rem 0.65rem;
+    font-size: 0.75rem;
     margin-bottom: 0;
 }
 
-/* Detail page */
+/* ── Detail Page ──────────────────────────────────────────────── */
 .detail-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 0.75rem;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.detail-grid > div > strong {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.45;
+    margin-bottom: 0.2rem;
 }
 
 .detail-full {
@@ -172,145 +269,177 @@ nav .nav-links a {
 }
 
 .plan-box {
-    background: var(--pico-card-background-color);
-    border: 2px solid var(--pico-primary);
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 1rem 0;
+    background: var(--surface-1);
+    border: 1px solid rgba(108, 138, 239, 0.25);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    margin: 0.75rem 0;
     white-space: pre-wrap;
+    font-size: 0.85rem;
 }
 
 .plan-actions {
     display: flex;
-    gap: 0.75rem;
-    margin-top: 0.75rem;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 .log-box {
-    background: #1a1a2e;
-    color: #e0e0e0;
-    padding: 1rem;
-    border-radius: 8px;
-    font-family: monospace;
-    font-size: 0.85rem;
+    background: var(--surface-3);
+    color: #b8b8c8;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    font-size: 0.8rem;
     white-space: pre-wrap;
     max-height: 400px;
     overflow-y: auto;
+    border: 1px solid var(--border);
 }
 
-/* Empty state */
+/* Custom scrollbar for log box */
+.log-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.log-box::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.log-box::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.log-box::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+/* ── Empty State ──────────────────────────────────────────────── */
 .empty-state {
     text-align: center;
-    padding: 3rem;
-    opacity: 0.6;
+    padding: 2.5rem;
+    opacity: 0.45;
 }
 
-/* Form layout */
+/* ── Form Layout ──────────────────────────────────────────────── */
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
-/* Context boxes (read-only descriptions on task form) */
+/* ── Context Boxes (task form read-only descriptions) ─────────── */
 .context-box {
-    background: var(--pico-card-background-color);
-    border: 1px solid var(--pico-muted-border-color);
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    margin-top: 0.25rem;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.6rem 0.85rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.82rem;
     white-space: pre-wrap;
-    opacity: 0.85;
-    min-height: 2rem;
+    opacity: 0.8;
+    min-height: 1.8rem;
 }
 
 .context-box:empty::before {
     content: "No description";
-    opacity: 0.4;
+    opacity: 0.35;
     font-style: italic;
 }
 
 .context-box-label {
-    font-size: 0.8rem;
-    opacity: 0.6;
-    margin-top: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.45;
+    margin-top: 0.4rem;
     margin-bottom: 0.15rem;
 }
 
-/* Manage cards (clients & projects pages) */
+/* ── Manage Cards (clients & projects) ────────────────────────── */
 .manage-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.65rem;
+    margin-top: 0.75rem;
 }
 
 .manage-card {
-    padding: 1rem 1.25rem;
-    border-radius: 8px;
-    background: var(--pico-card-background-color);
-    border: 1px solid var(--pico-muted-border-color);
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.35rem;
+}
+
+.manage-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 0 12px rgba(108, 138, 239, 0.06);
 }
 
 .manage-card h4 {
     margin: 0;
-    font-size: 1.05rem;
+    font-size: 0.95rem;
+    font-weight: 600;
 }
 
 .manage-card .card-desc {
-    font-size: 0.9rem;
-    opacity: 0.75;
+    font-size: 0.82rem;
+    opacity: 0.6;
     white-space: pre-wrap;
     flex: 1;
 }
 
 .manage-card .card-meta {
-    font-size: 0.8rem;
-    opacity: 0.5;
+    font-size: 0.72rem;
+    opacity: 0.4;
 }
 
 .manage-card .card-actions {
     display: flex;
-    gap: 0.5rem;
-    margin-top: 0.25rem;
+    gap: 0.4rem;
+    margin-top: 0.15rem;
 }
 
 .manage-card .card-actions button {
-    padding: 0.3rem 0.75rem;
-    font-size: 0.8rem;
+    padding: 0.25rem 0.65rem;
+    font-size: 0.75rem;
     margin-bottom: 0;
 }
 
-/* Inline add/edit form in manage pages */
+/* ── Inline Add/Edit Form ─────────────────────────────────────── */
 .manage-form {
-    background: var(--pico-card-background-color);
-    border: 2px solid var(--pico-primary);
-    border-radius: 8px;
-    padding: 1.25rem;
-    margin-bottom: 1.5rem;
+    background: var(--surface-1);
+    border: 1px solid rgba(108, 138, 239, 0.25);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
 }
 
 .manage-form h3 {
     margin-top: 0;
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
 }
 
 .manage-form .form-actions {
     display: flex;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    gap: 0.4rem;
+    margin-top: 0.4rem;
 }
 
 .manage-form .form-actions button {
     margin-bottom: 0;
 }
 
+/* ── Responsive ───────────────────────────────────────────────── */
 @media (max-width: 768px) {
     .form-row, .detail-grid { grid-template-columns: 1fr; }
     .stats-row { flex-direction: column; }
