@@ -80,6 +80,8 @@ async function handleSubmit(e) {
         approval_mode: form.approval_mode.value,
         priority: form.priority.value,
     };
+    const dueDate = form.due_date?.value;
+    if (dueDate) data.due_date = dueDate;
 
     try {
         const task = await API.createTask(data);

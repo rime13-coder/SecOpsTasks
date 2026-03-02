@@ -1,4 +1,5 @@
 let refreshTimer;
+let searchDebounce = null;
 
 const KANBAN_COLUMNS = [
     { key: "pending",     label: "Pending",     statusList: ["pending"],     color: "var(--pending)" },
@@ -21,6 +22,22 @@ function initBoard() {
     `).join("");
 }
 
+function formatDueDate(dateStr) {
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const [y, m, d] = dateStr.split("-").map(Number);
+    return `Due ${months[m - 1]} ${d}`;
+}
+
+function isOverdue(task) {
+    if (!task.due_date) return false;
+    const terminal = ["completed", "failed", "cancelled"];
+    if (terminal.includes(task.status)) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(task.due_date + "T00:00:00");
+    return due < today;
+}
+
 function renderTaskCard(task) {
     const needsApproval = task.status === "in_progress" && task.approval_mode === "ask" && task.plan;
     const isClosedTerminal = task.status === "failed" || task.status === "cancelled";
@@ -38,6 +55,10 @@ function renderTaskCard(task) {
         ? `<span class="badge badge-${task.status}">${task.status === "failed" ? "failed" : "cancelled"}</span>`
         : "";
 
+    const dueDateHtml = task.due_date
+        ? `<div class="kanban-card-due${isOverdue(task) ? " overdue" : ""}">${formatDueDate(task.due_date)}</div>`
+        : "";
+
     return `
         <div class="kanban-card" onclick="location.href='task_detail.html?id=${task.id}'">
             <div class="kanban-card-header">
@@ -48,6 +69,7 @@ function renderTaskCard(task) {
                 ${escapeHtml(task.client_name)} / ${escapeHtml(task.project_name)}
                 &middot; ${task.category}
             </div>
+            ${dueDateHtml}
             ${closedBadge ? `<div class="kanban-card-closed">${closedBadge}</div>` : ""}
             ${needsApproval ? `<div class="kanban-card-approval">Plan submitted — awaiting approval</div>` : ""}
             ${actions}
@@ -85,8 +107,10 @@ async function loadTasks() {
     const params = {};
     const client = document.getElementById("filter-client")?.value;
     const category = document.getElementById("filter-category")?.value;
+    const search = document.getElementById("filter-search")?.value?.trim();
     if (client) params.client = client;
     if (category) params.category = category;
+    if (search) params.search = search;
 
     const tasks = await API.getTasks(params);
 
@@ -123,6 +147,10 @@ async function loadTasks() {
     }
 
     restoreScrollPositions(scrollPos);
+
+    // Update document title with pending count
+    const pendingCount = (grouped["pending"] || []).length;
+    document.title = pendingCount > 0 ? `(${pendingCount}) SecOps Tasks` : "SecOps Tasks";
 }
 
 async function approveTask(id) {
@@ -148,6 +176,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     document.getElementById("filter-client")?.addEventListener("change", loadTasks);
     document.getElementById("filter-category")?.addEventListener("change", loadTasks);
+
+    document.getElementById("filter-search")?.addEventListener("input", () => {
+        clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(loadTasks, 300);
+    });
 
     refreshTimer = setInterval(loadTasks, 10000);
 });

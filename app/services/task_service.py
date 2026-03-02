@@ -11,6 +11,7 @@ def _now() -> str:
 _TASK_SELECT = """
     SELECT t.id, t.title, t.description, t.required_actions,
            t.approval_mode, t.status, t.priority, t.category,
+           t.due_date,
            t.plan, t.summary, t.execution_log, t.output_folder,
            t.claimed_at, t.created_at, t.updated_at,
            COALESCE(c.name, t.client_name, '')          AS client_name,
@@ -28,6 +29,7 @@ async def list_tasks(
     client: str | None = None,
     project: str | None = None,
     category: str | None = None,
+    search: str | None = None,
 ) -> list[dict]:
     db = await get_db()
     clauses, params = [], []
@@ -43,6 +45,9 @@ async def list_tasks(
     if category:
         clauses.append("t.category = ?")
         params.append(category)
+    if search:
+        clauses.append("(t.title LIKE ? OR t.description LIKE ?)")
+        params.extend([f"%{search}%", f"%{search}%"])
     where = " AND ".join(clauses)
     sql = _TASK_SELECT + (f" WHERE {where}" if where else "") + " ORDER BY t.created_at DESC"
     rows = await db.execute(sql, params)
@@ -78,15 +83,15 @@ async def create_task(data: dict) -> dict:
         """INSERT INTO tasks
            (client_id, project_id, client_name, project_name,
             title, description, required_actions,
-            approval_mode, priority, category, created_at, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            approval_mode, priority, category, due_date, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             data["client_id"], data["project_id"],
             client["name"] if client else "", project["name"] if project else "",
             data["title"],
             data.get("description", ""), data.get("required_actions", ""),
             data.get("approval_mode", "ask"), data.get("priority", "medium"),
-            data.get("category", "general"), now, now,
+            data.get("category", "general"), data.get("due_date"), now, now,
         ),
     )
     await db.commit()
@@ -101,10 +106,10 @@ async def update_task(task_id: int, data: dict) -> dict | None:
     allowed = {
         "client_id", "project_id", "title", "description", "required_actions",
         "approval_mode", "priority", "category", "status", "plan", "summary",
-        "execution_log", "output_folder", "claimed_at",
+        "execution_log", "output_folder", "claimed_at", "due_date",
     }
     # Nullable columns that can be explicitly set to NULL
-    nullable = {"claimed_at"}
+    nullable = {"claimed_at", "due_date"}
     fields, params = [], []
     for key, val in data.items():
         if key not in allowed:

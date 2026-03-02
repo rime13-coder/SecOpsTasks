@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     status          TEXT    NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','in_progress','approved','completed','failed','cancelled')),
     priority        TEXT    NOT NULL DEFAULT 'medium' CHECK(priority IN ('low','medium','high','urgent')),
     category        TEXT    NOT NULL DEFAULT 'general',
+    due_date        TEXT,
     plan            TEXT    NOT NULL DEFAULT '',
     summary         TEXT    NOT NULL DEFAULT '',
     execution_log   TEXT    NOT NULL DEFAULT '',

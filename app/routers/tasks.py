@@ -12,8 +12,9 @@ async def list_tasks(
     client: Optional[str] = Query(None),
     project: Optional[str] = Query(None),
     category: Optional[str] = Query(None),
+    search: Optional[str] = Query(None),
 ):
-    return await task_service.list_tasks(status=status, client=client, project=project, category=category)
+    return await task_service.list_tasks(status=status, client=client, project=project, category=category, search=search)
 
 
 @router.get("/stats", response_model=StatsOut)
@@ -36,7 +37,12 @@ async def create_task(data: TaskCreate):
 
 @router.put("/{task_id}", response_model=TaskOut)
 async def update_task(task_id: int, data: TaskUpdate):
-    updates = {k: v for k, v in data.model_dump().items() if v is not None}
+    nullable_fields = {"claimed_at", "due_date"}
+    raw = data.model_dump()
+    updates = {k: v for k, v in raw.items() if v is not None or k in nullable_fields}
+    # Remove fields that weren't explicitly set (still None and not in the request body)
+    sent_fields = data.model_fields_set
+    updates = {k: v for k, v in updates.items() if k in sent_fields}
     task = await task_service.update_task(task_id, updates)
     if not task:
         raise HTTPException(404, "Task not found")

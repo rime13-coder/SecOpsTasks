@@ -50,6 +50,7 @@ class TaskCreate(BaseModel):
     approval_mode: str = "ask"
     priority: str = "medium"
     category: str = "general"
+    due_date: Optional[str] = None
 
 
 class TaskUpdate(BaseModel):
@@ -65,6 +66,7 @@ class TaskUpdate(BaseModel):
     plan: Optional[str] = None
     summary: Optional[str] = None
     execution_log: Optional[str] = None
+    due_date: Optional[str] = None
 
 
 class PlanSubmit(BaseModel):
@@ -94,6 +96,7 @@ class TaskOut(BaseModel):
     status: str
     priority: str
     category: str
+    due_date: Optional[str] = None
     plan: str
     summary: str
     execution_log: str

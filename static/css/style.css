@@ -335,6 +335,24 @@ nav .nav-links a[role="button"] {
     max-width: 200px;
 }
 
+.filter-bar input[type="text"] {
+    flex: 2;
+    min-width: 160px;
+    max-width: 320px;
+}
+
+/* ── Due Date on Kanban Cards ────────────────────────────────── */
+.kanban-card-due {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+}
+
+.kanban-card-due.overdue {
+    color: var(--failed);
+    font-weight: 600;
+}
+
 /* ── Detail Page ──────────────────────────────────────────────── */
 .detail-grid {
     display: grid;

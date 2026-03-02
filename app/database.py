@@ -72,6 +72,13 @@ async def get_db() -> aiosqlite.Connection:
             except Exception:
                 pass  # column already exists
 
+        # Add due_date column if missing
+        try:
+            await _db.execute("ALTER TABLE tasks ADD COLUMN due_date TEXT")
+            await _db.commit()
+        except Exception:
+            pass  # column already exists
+
         # Migrate client/project data to normalized tables
         await _migrate_clients_projects(_db)
     return _db

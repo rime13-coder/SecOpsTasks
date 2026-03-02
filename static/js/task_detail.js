@@ -38,6 +38,7 @@ async function loadTask() {
     }
     document.getElementById("detail-category").textContent = task.category;
     document.getElementById("detail-mode").textContent = task.approval_mode;
+    document.getElementById("detail-due-date").textContent = task.due_date || "—";
     document.getElementById("detail-created").textContent = new Date(task.created_at + "Z").toLocaleString();
     document.getElementById("detail-updated").textContent = new Date(task.updated_at + "Z").toLocaleString();
     document.getElementById("detail-claimed").textContent = task.claimed_at
@@ -112,6 +113,7 @@ function toggleEditForm() {
     if (form.style.display === "none") {
         document.getElementById("edit-description").value = currentTask.description || "";
         document.getElementById("edit-actions").value = currentTask.required_actions || "";
+        document.getElementById("edit-due-date").value = currentTask.due_date || "";
         document.getElementById("edit-notes").value = "";
         form.style.display = "block";
     } else {
@@ -125,8 +127,10 @@ async function saveEdit() {
     const actions = document.getElementById("edit-actions").value.trim();
     const notes = document.getElementById("edit-notes").value.trim();
 
+    const dueDate = document.getElementById("edit-due-date").value || null;
     if (desc !== (currentTask.description || "")) updates.description = desc;
     if (actions !== (currentTask.required_actions || "")) updates.required_actions = actions;
+    if (dueDate !== (currentTask.due_date || null)) updates.due_date = dueDate;
     if (notes) {
         const existing = currentTask.summary || "";
         updates.summary = existing ? existing + "\n\n--- Notes ---\n" + notes : notes;
