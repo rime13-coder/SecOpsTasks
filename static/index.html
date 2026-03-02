@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="kanban-page">
     <nav>
         <a href="/" class="brand">SecOps Tasks</a>
         <div class="nav-links">
@@ -17,18 +17,7 @@
         </div>
     </nav>
 
-    <div id="stats-row" class="stats-row"></div>
-
     <div class="filter-bar">
-        <select id="filter-status">
-            <option value="">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="in_progress">In Progress</option>
-            <option value="approved">Approved</option>
-            <option value="completed">Completed</option>
-            <option value="failed">Failed</option>
-            <option value="cancelled">Cancelled</option>
-        </select>
         <select id="filter-client"></select>
         <select id="filter-category">
             <option value="">All Categories</option>
@@ -45,7 +34,7 @@
         </select>
     </div>
 
-    <div id="task-list" class="task-list">
+    <div id="kanban-board" class="kanban-board">
         <div class="empty-state"><p>Loading...</p></div>
     </div>
 

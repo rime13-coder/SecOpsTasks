@@ -1,19 +1,75 @@
 let refreshTimer;
 
-async function loadStats() {
-    const stats = await API.getStats();
-    document.getElementById("stats-row").innerHTML = [
-        { label: "Pending", value: stats.pending, cls: "pending" },
-        { label: "In Progress", value: stats.in_progress, cls: "in_progress" },
-        { label: "Approved", value: stats.approved, cls: "approved" },
-        { label: "Completed", value: stats.completed, cls: "completed" },
-        { label: "Failed", value: stats.failed, cls: "failed" },
-    ].map(s => `
-        <div class="stat-card" data-status="${s.cls}">
-            <div class="stat-value" style="color: var(--${s.cls})">${s.value}</div>
-            <div class="stat-label">${s.label}</div>
+const KANBAN_COLUMNS = [
+    { key: "pending",     label: "Pending",     statusList: ["pending"],     color: "var(--pending)" },
+    { key: "in_progress", label: "In Progress", statusList: ["in_progress"], color: "var(--in-progress)" },
+    { key: "approved",    label: "Approved",    statusList: ["approved"],    color: "var(--approved)" },
+    { key: "completed",   label: "Completed",   statusList: ["completed"],   color: "var(--completed)" },
+    { key: "closed",      label: "Closed",      statusList: ["failed", "cancelled"], color: "var(--failed)" },
+];
+
+function initBoard() {
+    const board = document.getElementById("kanban-board");
+    board.innerHTML = KANBAN_COLUMNS.map(col => `
+        <div class="kanban-column" data-column="${col.key}">
+            <div class="kanban-column-header" style="border-top-color: ${col.color}">
+                <span class="kanban-column-title">${col.label}</span>
+                <span class="kanban-column-count" data-count="${col.key}">0</span>
+            </div>
+            <div class="kanban-column-body" data-body="${col.key}"></div>
         </div>
     `).join("");
+}
+
+function renderTaskCard(task) {
+    const needsApproval = task.status === "in_progress" && task.approval_mode === "ask" && task.plan;
+    const isClosedTerminal = task.status === "failed" || task.status === "cancelled";
+
+    let actions = "";
+    if (needsApproval) {
+        actions = `
+            <div class="kanban-card-actions" onclick="event.stopPropagation()">
+                <button class="outline" onclick="approveTask(${task.id})" style="--pico-color: var(--completed)">Approve</button>
+                <button class="outline secondary" onclick="rejectTask(${task.id})">Reject</button>
+            </div>`;
+    }
+
+    const closedBadge = isClosedTerminal
+        ? `<span class="badge badge-${task.status}">${task.status === "failed" ? "failed" : "cancelled"}</span>`
+        : "";
+
+    return `
+        <div class="kanban-card" onclick="location.href='task_detail.html?id=${task.id}'">
+            <div class="kanban-card-header">
+                <span class="kanban-card-title">#${task.id} ${escapeHtml(task.title)}</span>
+                <span class="badge badge-${task.priority}">${task.priority}</span>
+            </div>
+            <div class="kanban-card-meta">
+                ${escapeHtml(task.client_name)} / ${escapeHtml(task.project_name)}
+                &middot; ${task.category}
+            </div>
+            ${closedBadge ? `<div class="kanban-card-closed">${closedBadge}</div>` : ""}
+            ${needsApproval ? `<div class="kanban-card-approval">Plan submitted — awaiting approval</div>` : ""}
+            ${actions}
+        </div>`;
+}
+
+function saveScrollPositions() {
+    const positions = {};
+    for (const col of KANBAN_COLUMNS) {
+        const body = document.querySelector(`[data-body="${col.key}"]`);
+        if (body) positions[col.key] = body.scrollTop;
+    }
+    return positions;
+}
+
+function restoreScrollPositions(positions) {
+    for (const col of KANBAN_COLUMNS) {
+        const body = document.querySelector(`[data-body="${col.key}"]`);
+        if (body && positions[col.key] !== undefined) {
+            body.scrollTop = positions[col.key];
+        }
+    }
 }
 
 async function loadFilters() {
@@ -23,66 +79,60 @@ async function loadFilters() {
         clients.map(c => `<option value="${c}">${c}</option>`).join("");
 }
 
-function renderTaskCard(task) {
-    const needsApproval = task.status === "in_progress" && task.approval_mode === "ask" && task.plan;
-    let actions = "";
-    if (needsApproval) {
-        actions = `
-            <div class="task-card-actions" onclick="event.stopPropagation()">
-                <button class="outline" onclick="approveTask(${task.id})" style="--pico-color: var(--completed)">Approve</button>
-                <button class="outline secondary" onclick="rejectTask(${task.id})">Reject</button>
-            </div>`;
-    }
-    return `
-        <div class="task-card" onclick="location.href='task_detail.html?id=${task.id}'">
-            <div class="task-card-header">
-                <h4>#${task.id} ${escapeHtml(task.title)}</h4>
-                <div class="task-card-badges">
-                    <span class="badge badge-${task.priority}">${task.priority}</span>
-                    <span class="badge badge-${task.status}">${task.status.replace("_", " ")}</span>
-                </div>
-            </div>
-            <div class="task-card-meta">
-                ${escapeHtml(task.client_name)} / ${escapeHtml(task.project_name)}
-                &middot; ${task.category}
-                &middot; ${task.approval_mode}
-                &middot; ${new Date(task.created_at + "Z").toLocaleString()}
-            </div>
-            ${needsApproval ? `<div style="margin-top:0.5rem;font-size:0.85rem;color:var(--pico-primary)">Plan submitted — awaiting approval</div>` : ""}
-            ${actions}
-        </div>`;
-}
-
 async function loadTasks() {
+    const scrollPos = saveScrollPositions();
+
     const params = {};
-    const status = document.getElementById("filter-status")?.value;
     const client = document.getElementById("filter-client")?.value;
     const category = document.getElementById("filter-category")?.value;
-    if (status) params.status = status;
     if (client) params.client = client;
     if (category) params.category = category;
 
     const tasks = await API.getTasks(params);
-    const container = document.getElementById("task-list");
-    if (tasks.length === 0) {
-        container.innerHTML = '<div class="empty-state"><p>No tasks found</p></div>';
-    } else {
-        container.innerHTML = tasks.map(renderTaskCard).join("");
+
+    // Group tasks by column
+    const grouped = {};
+    for (const col of KANBAN_COLUMNS) {
+        grouped[col.key] = [];
     }
+
+    for (const task of tasks) {
+        for (const col of KANBAN_COLUMNS) {
+            if (col.statusList.includes(task.status)) {
+                grouped[col.key].push(task);
+                break;
+            }
+        }
+    }
+
+    // Render cards into columns and update counts
+    for (const col of KANBAN_COLUMNS) {
+        const body = document.querySelector(`[data-body="${col.key}"]`);
+        const count = document.querySelector(`[data-count="${col.key}"]`);
+        const cards = grouped[col.key];
+
+        if (count) count.textContent = cards.length;
+
+        if (body) {
+            if (cards.length === 0) {
+                body.innerHTML = '<div class="kanban-empty">No tasks</div>';
+            } else {
+                body.innerHTML = cards.map(renderTaskCard).join("");
+            }
+        }
+    }
+
+    restoreScrollPositions(scrollPos);
 }
 
 async function approveTask(id) {
     await API.approveTask(id);
-    refresh();
+    await loadTasks();
 }
 
 async function rejectTask(id) {
     await API.rejectTask(id);
-    refresh();
-}
-
-async function refresh() {
-    await Promise.all([loadStats(), loadTasks()]);
+    await loadTasks();
 }
 
 function escapeHtml(str) {
@@ -92,12 +142,12 @@ function escapeHtml(str) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+    initBoard();
     await loadFilters();
-    await refresh();
+    await loadTasks();
 
-    document.getElementById("filter-status")?.addEventListener("change", loadTasks);
     document.getElementById("filter-client")?.addEventListener("change", loadTasks);
     document.getElementById("filter-category")?.addEventListener("change", loadTasks);
 
-    refreshTimer = setInterval(refresh, 10000);
+    refreshTimer = setInterval(loadTasks, 10000);
 });
